@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    <aside class="col-3">
+        <ul id="myUL">
+            <li>
+                <span class="caret">Languages</span>
+                <ul class="nested">
+                    <li>HTML</li>
+                    <li>CSS</li>
+                    <li>
+                        <span class="caret">JS</span>
+                        <ul class="nested">
+                            <li>What is the JS?</li>
+                            <li>JS Functions</li>
+                            <li>
+                                <span class="caret">Function Genres</span>
+                                <ul class="nested">
+                                    <li>Recursive Function</li>
+                                    <li>Sync Function</li>
+                                    <li>Async Function</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+
+    <main role="main" class="col-9">
+        <input type="text" placeholder="Enter Header" class="input-group-text" id="postHeader" />
+        <br />
+        <br />
+        <div id="summernote" style="width: 400px !important; height: 400px !important;"></div>
+    </main>
+</div>
+
+@section Scripts {
+    <script src="/scripts/sidebar/sidebar.js"></script>
+
+    <script>
+        $("#save").click(() => {
+
+        });
+
+        $(function () {
+            $('#summernote').summernote({
+
+            });
+            var styleEle = $("style#fixed");
+            if (styleEle.length == 0)
+                $("<style id=\"fixed\">.note-editor .dropdown-toggle::after { all: unset; } .note-editor .note-dropdown-menu { box-sizing: content-box; } .note-editor .note-modal-footer { box-sizing: content-box; }</style>")
+                    .prependTo("body");
+            else
+                styleEle.remove();
+        });
+
+
+    </script>
+}
