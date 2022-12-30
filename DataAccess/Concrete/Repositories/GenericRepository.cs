@@ -1,62 +1,88 @@
 ﻿using DataAccess.Abstract;
-using Entity.Concrete;
+using Entity.Abstract;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DataAccess.Concrete.Repositories
 {
-    public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
+    public class GenericRepository<Table> : IGenericRepository<Table> where Table : class, IEntity, new()
     {
         private readonly ArlentusDocsDbContext _ctx;
-        private readonly DbSet<TEntity> _dbSet;
+        private readonly DbSet<Table> _dbSet;
         public GenericRepository(ArlentusDocsDbContext ctx)
         {
             _ctx = ctx;
-            _dbSet = _ctx.Set<TEntity>();
+            _dbSet = _ctx.Set<Table>();
         }
 
-        public void Add(TEntity entity)
+        public void Add(Table entity)
         {
             _dbSet.Add(entity);
         }
 
-        public void Update(TEntity entity)
-        {
-            entity.UpdatedDate = DateTime.Now;
-            _dbSet.Attach(entity);
-            _ctx.Entry(entity).State = EntityState.Modified;
-        }
-
-        public void Delete(TEntity entity)
+        public void Delete(Table entity)
         {
             _dbSet.Remove(entity);
         }
 
-        public void Delete(int id)
+        public void DeleteById(int id)
         {
             var entity = GetById(id);
-            if (entity == null) return;
-            Delete(entity);
+            if (entity != null)
+            {
+                _dbSet.Remove(entity);
+            }
         }
 
-        public TEntity GetById(int id)
+        public IQueryable<Table> GetAll(Expression<Func<Table, bool>> filter = null, Func<IQueryable<Table>, IOrderedQueryable<Table>> orderBy = null, string includeProperties = null)
+        {
+            IQueryable<Table> query = _dbSet;
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (includeProperties != null)
+            {
+                foreach (var item in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(item);
+                }
+            }
+
+            if (orderBy != null)
+            {
+                return orderBy(query);
+            }
+
+            return query;
+        }
+
+        public Table GetById(int id)
         {
             return _dbSet.Find(id);
         }
 
-        public TEntity Get(Expression<Func<TEntity, bool>> expression)
+        public Table GetFirstOrDefault(Expression<Func<Table, bool>> filter = null, string includeProperties = null)
         {
-            return _dbSet.Where(expression).SingleOrDefault();
+            IQueryable<Table> query = _dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+
+            if (includeProperties != null)
+            {
+                foreach (var item in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(item);
+                }
+            }
+
+            return query.FirstOrDefault();
         }
 
-        public IQueryable GetAll()
+        public void Update(Table entity)
         {
-            return _dbSet; 
-        }
-
-        public IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> expression)
-        {
-            return _dbSet.Where(expression);
+            _dbSet.Update(entity);
         }
     }
 }

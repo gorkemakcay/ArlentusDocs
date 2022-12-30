@@ -1,18 +1,18 @@
-﻿using Entity.Concrete;
+﻿using Entity.Abstract;
+using Entity.Concrete;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Expressions;
 
 namespace DataAccess.Abstract
 {
-    public interface IGenericRepository<TEntity> where TEntity: BaseEntity
+    public interface IGenericRepository<Table> where Table : class, IEntity, new()
     {
-        void Add(TEntity entity);
-        void Update(TEntity entity);
-        void Delete(TEntity entity);
-        void Delete(int id);
-
-        TEntity GetById(int id);
-        TEntity Get(Expression<Func<TEntity, bool>> expression);
-        IQueryable GetAll();
-        IQueryable<TEntity> GetAll(Expression<Func<TEntity, bool>> expression);
+        void Add(Table entity);
+        void Delete(Table entity);
+        void DeleteById(int id);
+        void Update(Table entity);
+        IQueryable<Table> GetAll(Expression<Func<Table, bool>> filter = null, Func<IQueryable<Table>, IOrderedQueryable<Table>> orderBy = null, string includeProperties = null);
+        Table GetFirstOrDefault(Expression<Func<Table, bool>> filter = null, string includeProperties = null);
+        Table GetById(int id);
     }
 }

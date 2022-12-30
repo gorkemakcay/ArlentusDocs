@@ -1,0 +1,36 @@
+﻿<div class="row">
+    <div class="row" style="height: 100px;"></div>
+
+    <div class="col-3">
+        <div id="connectionStatus" style="border-radius: 25px; color: white; padding-left: 10px;"></div>
+        <div id="clientNotify" style="border-radius: 25px; color: white; padding-left: 10px;"></div>
+    </div>
+
+    <div class="col-6">
+        <div class="row text-center">
+            <div class="col-12">
+                <br />
+                <input type="text" placeholder="Enter message..." id="messageInput" style="border: none; border-radius: 25px; background-color: cornsilk; padding: 10px; width: 80%;" />
+                <button id="sendButton" class="btn" style="border: none; border-radius: 25px; background-color: orange; color: #3D3D3D; font-weight: 700; padding: 10px; width: 10%;">Send</button>
+            </div>
+        </div>
+
+        <div class="row mx-5 mt-1">
+            <div class="col-12">
+                <div id="chatBox" class="m-0 p-0"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-3">
+        <h5 class="text-white mt-4 text-center">Online Users</h5>
+        <div class="onlineClientList" style="background-color: white; border-radius: 25px;">
+            <ul id="onlineClient">
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/scripts/signalR/signalR.js"></script>
+}

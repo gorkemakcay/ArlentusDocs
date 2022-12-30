@@ -1,4 +1,4 @@
-#postHeader {
+/*#postHeader {
     width: 50%;
     background-color: darkorange;
     color: white;
@@ -11,7 +11,7 @@
     color: white;
     font-weight: 700;
     opacity: .7;
-}
+}*/
 
 html {
     font-size: 14px;
@@ -34,17 +34,25 @@ body {
 
 
 /* ASIDE AREA */
-ul, #myUL {
+ul, #treeList {
     list-style-type: none;
 }
 
-#myUL {
-    margin: 0;
-    padding: 0;
+li {
+    cursor: pointer;
 }
 
+#treeList {
+    margin: 0;
+    padding: 0;
+    color: white;
+}
+
+/*#treeList > ul {
+    padding-left: 24px;
+}*/
+
 .caret {
-    cursor: pointer;
     -webkit-user-select: none; /* Safari 3.1+ */
     -moz-user-select: none; /* Firefox 2+ */
     -ms-user-select: none; /* IE 10+ */
@@ -52,8 +60,10 @@ ul, #myUL {
 }
 
     .caret::before {
-        content: "\25B6";
-        color: black;
+        /*content: "\25B6";*/
+        /*content: "\1F5C0";*/
+        content: ">";
+        color: white;
         display: inline-block;
         margin-right: 6px;
     }

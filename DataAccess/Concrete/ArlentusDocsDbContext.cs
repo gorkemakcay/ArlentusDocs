@@ -9,6 +9,21 @@ namespace DataAccess.Concrete
 {
     public class ArlentusDocsDbContext : IdentityDbContext<AppUser, AppRole, int>
     {
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlServer(@"Server=DESKTOP-P12SOIP\SQLEXPRESS;Database=ArlentusDocs;uid=umutd;pwd=Ud4583!");
+
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        //public ArlentusDocsDbContext(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(@"Server=DESKTOP-P12SOIP\\SQLEXPRESS;Database=ArlentusDocs;uid=umutd;pwd=Ud4583!");
+        //}
+        //public ArlentusDocsDbContext(DbContextOptions<ArlentusDocsDbContext> options) : base(options)
+        //{
+
+        //}
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -72,8 +87,8 @@ namespace DataAccess.Concrete
             base.OnModelCreating(builder);
         }
 
-        public DbSet<AppUser> AppUsers { get; set; }
-        public DbSet<AppRole> AppRoles { get; set; }
+        //public DbSet<AppUser> AppUsers { get; set; }
+        //public DbSet<AppRole> AppRoles { get; set; }
         public DbSet<Post> Posts { get; set; }
     }
 }

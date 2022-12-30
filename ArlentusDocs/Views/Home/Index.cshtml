@@ -2,62 +2,226 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="row">
-    <aside class="col-3">
-        <ul id="myUL">
+<div class="row" style="margin: 20px;">
+    <div id="treeListArea" class="col-2">
+        @*<ul id="treeList">
             <li>
-                <span class="caret">Languages</span>
+                <span>Beverages</span>
+
+            </li>
+
+            <li>
+                <span class="caret">Header 1 </span>
+                <i style="color: white; background-color: green; cursor: pointer;" onclick="newPost(1)">&nbsp;(+)&nbsp;</i>
                 <ul class="nested">
-                    <li>HTML</li>
-                    <li>CSS</li>
+                    <li>Header 2</li>
+                    <li>Header 3</li>
                     <li>
-                        <span class="caret">JS</span>
+                        <span class="caret">Header 4</span>
                         <ul class="nested">
-                            <li>What is the JS?</li>
-                            <li>JS Functions</li>
+                            <li>Header 5</li>
+                            <li>Header 6</li>
                             <li>
-                                <span class="caret">Function Genres</span>
+                                <span class="caret">Header 7</span>
                                 <ul class="nested">
-                                    <li>Recursive Function</li>
-                                    <li>Sync Function</li>
-                                    <li>Async Function</li>
+                                    <li>Header 8</li>
+                                    <li>Header 9</li>
+                                    <li>Header 10</li>
+                                    <li>Header 11</li>
                                 </ul>
                             </li>
                         </ul>
                     </li>
                 </ul>
             </li>
-        </ul>
-    </aside>
 
-    <main role="main" class="col-9">
-        <input type="text" placeholder="Enter Header" class="input-group-text" id="postHeader" />
+            <li>
+                <span class="caret">Films</span>
+                <ul class="nested">
+                    <li>Sci-Fi</li>
+                    <li>History</li>
+                    <li>
+                        <span class="caret">Comedy</span>
+                        <ul class="nested">
+                            <li>Film Name 01</li>
+                            <li>Film Name 02</li>
+                            <li>
+                                <span class="caret">Film Name 03</span>
+                                <ul class="nested">
+                                    <li>Child 0</li>
+                                    <li>Child 1</li>
+                                    <li>Child 2</li>
+                                    <li>Child 3</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span class="caret">Beverages</span>
+                <ul class="nested">
+                    <li>Water</li>
+                    <li>Coffee</li>
+                    <li>
+                        <span class="caret">Tea</span>
+                        <ul class="nested">
+                            <li>Black Tea</li>
+                            <li>White Tea</li>
+                            <li>
+                                <span class="caret">Green Tea</span>
+                                <ul class="nested">
+                                    <li>Sencha</li>
+                                    <li>Gyokuro</li>
+                                    <li>Matcha</li>
+                                    <li>Pi Lo Chun</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <span style="color: white; background-color: green; cursor: pointer;" onclick="newPost(0)">&nbsp; Add New Title (+) &nbsp;</span>
+            </li>
+        </ul>*@
+
+    </div>
+
+    <div class="col-10">
+        <div id="buttonArea"></div>
         <br />
         <br />
-        <div id="summernote" style="width: 400px !important; height: 400px !important;"></div>
-    </main>
+        <div id="postArea">
+            <div id="header"></div>
+            <div id="summernote"></div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
-    <script src="/scripts/sidebar/sidebar.js"></script>
-
-    <script>
-        $("#save").click(() => {
-
-        });
-
-        $(function () {
-            $('#summernote').summernote({
-
-            });
-            var styleEle = $("style#fixed");
-            if (styleEle.length == 0)
-                $("<style id=\"fixed\">.note-editor .dropdown-toggle::after { all: unset; } .note-editor .note-dropdown-menu { box-sizing: content-box; } .note-editor .note-modal-footer { box-sizing: content-box; }</style>")
-                    .prependTo("body");
-            else
-                styleEle.remove();
-        });
-
-
-    </script>
+    <script src="~/scripts/sidebar/sidebar.js"></script>
+    <script src="~/scripts/post/post.js"></script>
 }

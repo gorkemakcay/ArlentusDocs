@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Entity.Concrete;
 
 namespace Common.ViewModels.Post
 {
-    internal class AddPostVM
+    public class AddPostVM : BaseEntity
     {
+        public int ParentId { get; set; }
+        public string? CreatedBy { get; set; }
+        public string Header { get; set; }
+        public string? Context { get; set; }
+        public string? ContextPath { get; set; }
     }
 }
