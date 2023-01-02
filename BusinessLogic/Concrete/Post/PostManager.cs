@@ -81,16 +81,24 @@ namespace BusinessLogic.Concrete.Post
 
         }
 
+        public string GetAllPosts()
+        {
+            var model = _mapper.Map<List<DetailPostVM>>(GetAll());
+            if (model != null)
+            {
+                var JSONmodel = JsonConvert.SerializeObject(model);
+                return JSONmodel;
+            }
+            else return null;
+
+        }
+
         public string GetAllPostsByParentId(int parentId)
         {
-            //var model = _mapper.Map<List<ListPostVM>>(GetAll(x => x.ParentId == parentId).Select(x => new ListPostVM{ Id = x.Id, Header = x.Header }).ToList());
             var model = _mapper.Map<List<ListPostVM>>(GetAll(x => x.ParentId == parentId));
             if (model != null)
             {
-                var JSONmodel = JsonConvert.SerializeObject(model, new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                });
+                var JSONmodel = JsonConvert.SerializeObject(model);
                 return JSONmodel;
             }
             else return null;

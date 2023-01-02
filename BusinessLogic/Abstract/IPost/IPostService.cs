@@ -1,5 +1,6 @@
 ﻿using Common.ViewModels.Post;
 using Entity.Concrete.Post;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessLogic.Abstract.IPost
 {
@@ -11,5 +12,6 @@ namespace BusinessLogic.Abstract.IPost
         string UpdatePost(UpdatePostVM model);
         string DeletePostById(int id);
         bool HaveAChild(int postId);
+        string GetAllPosts();
     }
 }

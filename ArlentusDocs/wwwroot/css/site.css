@@ -82,3 +82,7 @@ li {
     display: block;
 }
 /* ASIDE AREA */
+
+.jstree {
+    color: white;
+}

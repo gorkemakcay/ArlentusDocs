@@ -45,6 +45,12 @@ namespace ArlentusDocs.Controllers
         }
 
         [HttpGet]
+        public IActionResult GetAllPosts()
+        {
+            return Json(_service.GetAllPosts());
+        }
+
+        [HttpGet]
         public IActionResult HaveAChild(int postId)
         {
             return Json(_service.HaveAChild(postId));

@@ -6,6 +6,7 @@ namespace Common.ViewModels.Post
     {
         public int Id { get; set; }
         public string Header { get; set; }
+        public int ParentId { get; set; }
     }
 
     //public class ListPostVM

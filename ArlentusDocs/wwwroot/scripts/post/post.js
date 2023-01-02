@@ -2,26 +2,200 @@
 var treeListArea = $("#treeListArea");
 var buttonArea = $("#buttonArea");
 var postArea = $("#postArea");
+var treeListClicked = false;
 
 $(function () {
-    refreshTreeList();
 
-    // #region Default Post Configurations
+
+    //$("#treeListArea").fancytree({
+    //    extensions: ["edit", "filter"],
+    //    source:
+    //    {
+    //        //url:
+    //        //    "https://cdn.rawgit.com/mar10/fancytree/72e03685/demo/ajax-tree-products.json"
+
+    //        type: "GET",
+    //        url: "/Post/GetAllPostsByParentId",
+    //        data: { parentId: 0 },
+    //        success: function (response) {
+    //            console.log(response);
+
+
+
+    //            //var responseArray = [];
+
+    //            //$.each(response, function (index, value) {
+    //            //    var responseList = {
+    //            //        title: "",
+    //            //        key: ""
+    //            //    }
+    //            //    responseList.title = value.header;
+    //            //    responseList.key = index;
+    //            //    responseArray.push(responseList);
+    //            //    //console.log(responseArray);
+    //            //});
+    //            //var responseArrayJSON = JSON.stringify(responseArray);
+    //            //response = responseArrayJSON;
+    //            //console.log(response);
+
+    //            //var stringRA = $.parseJSON(responseArrayJSON);
+    //            //console.log(stringRA);
+    //        },
+    //        cache: false
+    //    }
+    //    //source: [
+    //    //    {
+    //    //        title: "Node 1",
+    //    //        key: "1"
+    //    //    },
+    //    //    {
+    //    //        title: "Folder 2",
+    //    //        key: "2",
+    //    //        folder: true,
+    //    //        children:
+    //    //            [
+    //    //                {
+    //    //                    title: "Node 2.1",
+    //    //                    key: "3",
+    //    //                    myOwnAttr: "abc"
+    //    //                },
+    //    //                {
+    //    //                    title: "Node 2.2",
+    //    //                    key: "4"
+    //    //                }
+    //    //            ]
+    //    //    },
+    //    //    {
+    //    //        title: "Folder 3",
+    //    //        key: "5",
+    //    //        folder: true,
+    //    //        children:
+    //    //            [
+    //    //                {
+    //    //                    title: "Node 3.1",
+    //    //                    key: "6"
+    //    //                },
+    //    //                {
+    //    //                    title: "Node 3.2",
+    //    //                    key: "7"
+    //    //                }
+    //    //            ]
+    //    //    }
+    //    //]
+    //});
+
+    var arrayCollection = [
+        { "id": "device", "parent": "#", "text": "Devices", "icon": "" },
+        { "id": "mobile", "parent": "device", "text": "Mobile Phones", "icon": "" },
+        { "id": "apple", "parent": "mobile", "text": "Apple IPhone 6", "icon": "/" },
+        { "id": "samsung", "parent": "mobile", "text": "Samsung Note II", "icon": "/" },
+    ];
+
     $.ajax({
         type: "GET",
-        url: "/Post/GetPostById",
-        data: { id: 18 }, // [Not Completed]
+        url: "/Post/GetAllPosts",
         success: function (response) {
-            post = jQuery.parseJSON(response);
+            var model = $.parseJSON(response);
 
-            var editButton = `<button type="button" onclick="editPost()">Edit</button>`;
-            buttonArea.append(editButton);
 
-            var header = `<h4 id="postHeader">${post.Header}</h4>`;
-            $("#header").append(header);
-            $("#summernote").append(post.Context);
+            var postCollection = [];
+            $.each(model, function (index, value) {
+                var parent = "";
+                var icon = "";
+                if (value.ParentId == 0) {
+                    parent = "#";
+                }
+                else {
+                    parent = `post${value.ParentId}`;
+                }
+
+                var post = {
+                    "id": `post${value.Id}`,
+                    "parent": parent,
+                    "text": `${value.Header}`,
+                    "icon": icon
+                }
+
+                postCollection.push(post);
+            });
+            console.table(postCollection);
+
+
+            $('#treeListArea').jstree({
+                "core": {
+                    "animation": 0,
+                    "check_callback": true,
+                    "themes": { "stripes": true },
+                    'data': postCollection
+                },
+                "types": {
+                    "#": {
+                        "max_children": 1,
+                        "max_depth": 4,
+                        "valid_children": ["root"]
+                    },
+                    "root": {
+                        "icon": "/static/3.3.12/assets/images/tree_icon.png",
+                        "valid_children": ["default"]
+                    },
+                    "default": {
+                        "valid_children": ["default", "file"]
+                    },
+                    "file": {
+                        "icon": "glyphicon glyphicon-file",
+                        "valid_children": []
+                    }
+                },
+                "plugins": [
+                    "contextmenu", "dnd", "search",
+                    "state", "types", "wholerow"
+                ]
+            });
+
+            $('#treeListArea').on("select_node.jstree", function (e, data) {
+                var postId = data.node.id.split('post')[1];
+                $.ajax({
+                    type: "GET",
+                    url: "post/GetPostById",
+                    data: { id: postId },
+                    success: function (response) {
+                        var postDetail = $.parseJSON(response);
+
+                        buttonArea.children().remove();
+                        var editButton = `<button type="button" onclick="editPost(${postDetail.Id})">Edit</button>`;
+                        buttonArea.append(editButton);
+
+                        $("#header").children().remove();
+                        var header = `<h4 id="postHeader">${postDetail.Header}</h4>`;
+                        $("#header").append(header);
+
+                        $("#summernote").children().remove();
+                        $("#summernote").append(postDetail.Context);
+                    }
+                });
+            });
         }
     });
+
+
+    //refreshTreeList();
+
+    // #region Default Post Configurations
+    //$.ajax({
+    //    type: "GET",
+    //    url: "/Post/GetPostById",
+    //    data: { id: 18 }, // [Not Completed]
+    //    success: function (response) {
+    //        post = jQuery.parseJSON(response);
+
+    //        var editButton = `<button type="button" onclick="editPost()">Edit</button>`;
+    //        buttonArea.append(editButton);
+
+    //        var header = `<h4 id="postHeader">${post.Header}</h4>`;
+    //        $("#header").append(header);
+    //        $("#summernote").append(post.Context);
+    //    }
+    //});
     // #endregion
 
     // #region Summernote Configurations
@@ -39,16 +213,55 @@ $(function () {
 // #region Refresh Event Listeners
 function refreshEventListener() {
     $(".title").click(function () {
-        var postId = this.id.split('post')[1];
+        if (treeListClicked) {
+            treeListClicked = true;
+        }
+        else {
+            treeListClicked = false;
+        }
+        var liId = this.id;
+        var postId = liId.split('post')[1];
         $.ajax({
             type: "GET",
             url: "/Post/GetAllPostsByParentId",
             data: { parentId: postId },
             success: function (response) {
                 var childList = $.parseJSON(response);
-                $.each(childList, function (index, child) {
+                if (childList != null) {
+                    console.log($(`#${liId}`).html());
+                    $(`#${liId}`).append(`<ul class="nested"></ul>`);
+                    console.log($(`#${liId}`).html());
 
-                });
+                    var toggler = $(".caret");
+
+                    for (var i = 0; i < toggler.length; i++) {
+                        toggler[i].addEventListener("click", function () {
+                            this.parentElement.querySelector(".nested").classList.toggle("active");
+                            this.classList.toggle("caret-down");
+                        });
+                    }
+
+                    $.each(childList, function (index, child) {
+                        $.ajax({
+                            async: false,
+                            type: "GET",
+                            url: "/Post/HaveAChild",
+                            data: { postId: post.Id },
+                            success: function (haveAChild) {
+                                if (haveAChild) {
+                                    var title =
+                                        `
+                                            
+                                        `;
+                                }
+                                else {
+
+                                }
+                            }
+                        });
+                    });
+                }
+
             }
         });
     });
@@ -75,15 +288,20 @@ function refreshTreeList() {
                         url: "/Post/HaveAChild",
                         data: { postId: post.Id },
                         success: function (haveAChild) {
-                            var title =
-                                `<li>
-                                    <span id="post${post.Id}" class="title">${post.Header} </span>
-                                    <i style="color: white; background-color: green; cursor: pointer; border-radius: 5px;" onclick="newPost(${post.Id})">&nbsp; + &nbsp;</i>
-                                </li>`;
+                            if (haveAChild) {
+                                var title =
+                                    `<li id="post${post.Id}" class="title caret">
+                                        <span>${post.Header}</span>
+                                        <i style="color: white; background-color: green; cursor: pointer; border-radius: 5px;" onclick="newPost (${post.Id})">&nbsp; + &nbsp;</i>
+                                    </li>`;
+                            }
+                            else {
+                                var title =
+                                    `<li id="post${post.Id}" class="title">${post.Header}
+                                        <i style="color: white; background-color: green; cursor: pointer; border-radius: 5px;" onclick="newPost (${post.Id})">&nbsp; + &nbsp;</i>
+                                    </li>`;
+                            }
                             $("#treeList").append(title);
-
-                            if (haveAChild)
-                                $(`#post${post.Id}`).addClass('caret');
                         }
                     });
                 });
