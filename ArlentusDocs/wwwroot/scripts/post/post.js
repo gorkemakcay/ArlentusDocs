@@ -1,129 +1,56 @@
-﻿var post;
+﻿var currentPost;
 var treeListArea = $("#treeListArea");
 var buttonArea = $("#buttonArea");
 var postArea = $("#postArea");
 var treeListClicked = false;
 
 $(function () {
-
-
-    //$("#treeListArea").fancytree({
-    //    extensions: ["edit", "filter"],
-    //    source:
-    //    {
-    //        //url:
-    //        //    "https://cdn.rawgit.com/mar10/fancytree/72e03685/demo/ajax-tree-products.json"
-
-    //        type: "GET",
-    //        url: "/Post/GetAllPostsByParentId",
-    //        data: { parentId: 0 },
-    //        success: function (response) {
-    //            console.log(response);
-
-
-
-    //            //var responseArray = [];
-
-    //            //$.each(response, function (index, value) {
-    //            //    var responseList = {
-    //            //        title: "",
-    //            //        key: ""
-    //            //    }
-    //            //    responseList.title = value.header;
-    //            //    responseList.key = index;
-    //            //    responseArray.push(responseList);
-    //            //    //console.log(responseArray);
-    //            //});
-    //            //var responseArrayJSON = JSON.stringify(responseArray);
-    //            //response = responseArrayJSON;
-    //            //console.log(response);
-
-    //            //var stringRA = $.parseJSON(responseArrayJSON);
-    //            //console.log(stringRA);
-    //        },
-    //        cache: false
-    //    }
-    //    //source: [
-    //    //    {
-    //    //        title: "Node 1",
-    //    //        key: "1"
-    //    //    },
-    //    //    {
-    //    //        title: "Folder 2",
-    //    //        key: "2",
-    //    //        folder: true,
-    //    //        children:
-    //    //            [
-    //    //                {
-    //    //                    title: "Node 2.1",
-    //    //                    key: "3",
-    //    //                    myOwnAttr: "abc"
-    //    //                },
-    //    //                {
-    //    //                    title: "Node 2.2",
-    //    //                    key: "4"
-    //    //                }
-    //    //            ]
-    //    //    },
-    //    //    {
-    //    //        title: "Folder 3",
-    //    //        key: "5",
-    //    //        folder: true,
-    //    //        children:
-    //    //            [
-    //    //                {
-    //    //                    title: "Node 3.1",
-    //    //                    key: "6"
-    //    //                },
-    //    //                {
-    //    //                    title: "Node 3.2",
-    //    //                    key: "7"
-    //    //                }
-    //    //            ]
-    //    //    }
-    //    //]
-    //});
-
-    var arrayCollection = [
-        { "id": "device", "parent": "#", "text": "Devices", "icon": "" },
-        { "id": "mobile", "parent": "device", "text": "Mobile Phones", "icon": "" },
-        { "id": "apple", "parent": "mobile", "text": "Apple IPhone 6", "icon": "/" },
-        { "id": "samsung", "parent": "mobile", "text": "Samsung Note II", "icon": "/" },
-    ];
+    // #region jsTree Data Example
+    //var arrayCollection = [
+    //    { "id": "device", "parent": "#", "text": "Devices", "icon": "" },
+    //    { "id": "mobile", "parent": "device", "text": "Mobile Phones", "icon": "" },
+    //    { "id": "apple", "parent": "mobile", "text": "Apple IPhone 6", "icon": "/" },
+    //    { "id": "samsung", "parent": "mobile", "text": "Samsung Note II", "icon": "/" },
+    //];
+    // #endregion
 
     $.ajax({
         type: "GET",
         url: "/Post/GetAllPosts",
         success: function (response) {
-            var model = $.parseJSON(response);
-
-
+            var postList = $.parseJSON(response);
             var postCollection = [];
-            $.each(model, function (index, value) {
+            var rootModel = {
+                "id": `root`,
+                "parent": "#",
+                "text": `Root`,
+                "type": "root"
+            }
+            postCollection.push(rootModel);
+
+            $.each(postList, function (index, value) {
                 var parent = "";
                 var icon = "";
                 if (value.ParentId == 0) {
-                    parent = "#";
+                    parent = "root";
                 }
                 else {
                     parent = `post${value.ParentId}`;
                 }
 
-                var post = {
+                var postModel = {
                     "id": `post${value.Id}`,
                     "parent": parent,
                     "text": `${value.Header}`,
                     "icon": icon
                 }
 
-                postCollection.push(post);
+                postCollection.push(postModel);
             });
-            console.table(postCollection);
-
 
             $('#treeListArea').jstree({
                 "core": {
-                    "animation": 0,
+                    "animation": 200,
                     "check_callback": true,
                     "themes": { "stripes": true },
                     'data': postCollection
@@ -135,45 +62,67 @@ $(function () {
                         "valid_children": ["root"]
                     },
                     "root": {
-                        "icon": "/static/3.3.12/assets/images/tree_icon.png",
+                        //"icon": "/static/3.3.12/assets/images/tree_icon.png",
+                        "icon": "",
                         "valid_children": ["default"]
                     },
                     "default": {
                         "valid_children": ["default", "file"]
                     },
                     "file": {
-                        "icon": "glyphicon glyphicon-file",
+                        "icon": "",
                         "valid_children": []
                     }
                 },
                 "plugins": [
-                    "contextmenu", "dnd", "search",
-                    "state", "types", "wholerow"
+                    "contextmenu",
+                    "dnd",
+                    "search",
+                    "state",
+                    "types",
+                    "wholerow"
                 ]
             });
 
             $('#treeListArea').on("select_node.jstree", function (e, data) {
+                console.log(e);
+                console.log("-----(select)-----");
+                console.log(data);
+
                 var postId = data.node.id.split('post')[1];
                 $.ajax({
                     type: "GET",
                     url: "post/GetPostById",
                     data: { id: postId },
                     success: function (response) {
-                        var postDetail = $.parseJSON(response);
+                        currentPost = $.parseJSON(response);
 
                         buttonArea.children().remove();
-                        var editButton = `<button type="button" onclick="editPost(${postDetail.Id})">Edit</button>`;
+                        var editButton = `<button type="button" onclick="editPost(${currentPost.Id})">Edit</button>`;
                         buttonArea.append(editButton);
 
                         $("#header").children().remove();
-                        var header = `<h4 id="postHeader">${postDetail.Header}</h4>`;
+                        var header = `<h4 id="postHeader">${currentPost.Header}</h4>`;
                         $("#header").append(header);
 
                         $("#summernote").children().remove();
-                        $("#summernote").append(postDetail.Context);
+                        $("#summernote").append(currentPost.Context);
                     }
                 });
             });
+
+            $('#treeListArea').on("create_node.jstree", function (e, data) {
+                console.log(e);
+                console.log("-----(create)-----");
+                console.log(data);
+
+                var parentId = data.node.parent.split('post')[1];
+                console.log(parentId);
+                var header = data.node.text;
+                console.log(header);
+            });
+
+            
         }
     });
 
@@ -209,6 +158,21 @@ $(function () {
 });
 
 // #region Functions
+
+function demo_create() {
+    var ref = $('#treeListArea').jstree(true),
+        sel = ref.get_selected();
+    if (!sel.length) { return false; }
+    sel = sel[0];
+    sel = ref.create_node(sel, { "type": "file" });
+    if (sel) {
+        ref.edit(sel);
+    }
+};
+
+function demo_refresh() {
+    $('#treeListArea').jstree('refresh');
+}
 
 // #region Refresh Event Listeners
 function refreshEventListener() {
@@ -342,8 +306,8 @@ function editPost(postId) {
 
     // Post Area
     postArea.children().remove();
-    var header = `<input id="postHeader" type="text" placeholder="Header" style="width: 100%;" value="${post.Header}" />`;
-    var context = `<div id="summernote">${post.Context}</div>`;
+    var header = `<input id="postHeader" type="text" placeholder="Header" style="width: 100%;" value="${currentPost.Header}" />`;
+    var context = `<div id="summernote">${currentPost.Context}</div>`;
     postArea.append(header, context);
     $('#summernote').summernote();
 }
@@ -355,13 +319,13 @@ function savePost(type, parentOrPostId) {
     // if type = add    -> parentOrPostId = parentId
     switch (type) {
         case 'update':
-            post.Header = $("#postHeader").val();
-            post.Context = $('#summernote').summernote('code');
+            currentPost.Header = $("#postHeader").val();
+            currentPost.Context = $('#summernote').summernote('code');
 
             $.ajax({
                 type: "PUT",
                 url: "/Post/UpdatePost",
-                data: { model: post },
+                data: { model: currentPost },
                 success: function (response) {
                     var updatedPostModel = jQuery.parseJSON(response);
 
@@ -425,3 +389,33 @@ function savePost(type, parentOrPostId) {
 // #endregion
 
 // #endregion
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function demo_rename() {
+    var ref = $('#jstree_demo').jstree(true),
+        sel = ref.get_selected();
+    if (!sel.length) { return false; }
+    sel = sel[0];
+    ref.edit(sel);
+};
+
+function demo_delete() {
+    var ref = $('#jstree_demo').jstree(true),
+        sel = ref.get_selected();
+    if (!sel.length) { return false; }
+    ref.delete_node(sel);
+};
