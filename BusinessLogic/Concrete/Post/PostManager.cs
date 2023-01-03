@@ -34,25 +34,34 @@ namespace BusinessLogic.Concrete.Post
                 var filePath = Path.Combine(basePath, fileName);
                 if (!File.Exists(filePath))
                 {
-                    // Create a new .txt     
-                    using (FileStream fs = File.Create(filePath))
+                    // Create a new .txt
+                    if (model.Context == null)
+                        using (File.Create(filePath))
+                        { }
+                    else
                     {
+                        using FileStream fs = File.Create(filePath);
                         // Add text to file    
                         Byte[] context = new UTF8Encoding(true).GetBytes(model.Context);
                         fs.Write(context, 0, context.Length);
                     }
 
-                    model.ContextPath = filePath;
-                    model.Context = null;
-
-                    using (var dbContext = new ArlentusDocsDbContext())
+                    using var dbContext = new ArlentusDocsDbContext();
+                    var post = new Entity.Concrete.Post.Post()
                     {
-                        dbContext.Posts.Add(_mapper.Map<Entity.Concrete.Post.Post>(model));
-                        dbContext.SaveChanges();
-
-                        int id = model.Id;
-                        return id;
-                    }
+                        Context = null,
+                        ContextPath = filePath,
+                        CreatedBy = model.CreatedBy,
+                        CreatedDate = DateTime.Now,
+                        Header = model.Header,
+                        IsActive = true,
+                        IsDeleted = false,
+                        ParentId = model.ParentId,
+                        UpdatedDate = null
+                    };
+                    dbContext.Posts.Add(post);
+                    dbContext.SaveChanges();
+                    return post.Id;
                 }
             }
             catch (Exception ex)
@@ -141,9 +150,14 @@ namespace BusinessLogic.Concrete.Post
         {
             try
             {
-                Byte[] context = new UTF8Encoding(true).GetBytes(model.Context);
-                model.Context = null;
-                File.WriteAllBytes(model.ContextPath, context);
+                if (model.Context == null) File.WriteAllText(model.ContextPath, " ");
+                else
+                {
+                    Byte[] context = new UTF8Encoding(true).GetBytes(model.Context);
+                    File.WriteAllBytes(model.ContextPath, context);
+                    model.Context = null;
+                }
+                model.UpdatedDate = DateTime.Now;
                 Update(_mapper.Map<Entity.Concrete.Post.Post>(model));
                 _uow.SaveChange();
                 var updatedModel = GetPostDetail(model.Id);

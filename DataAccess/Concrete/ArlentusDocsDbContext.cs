@@ -84,6 +84,26 @@ namespace DataAccess.Concrete
 
             #endregion
 
+            #region Create Root Post
+            builder.Entity<Post>(post =>
+            {
+                post.HasData(
+                    new Post
+                    {
+                        Id = 1,
+                        Context = null,
+                        CreatedBy = "Admin",
+                        CreatedDate = new DateTime(2023, 01, 03, 12, 00, 00, 000, DateTimeKind.Local).AddTicks(6434),
+                        UpdatedDate = null,
+                        Header = "Root",
+                        IsActive = true,
+                        IsDeleted = false,
+                        ParentId = 0,
+                        ContextPath = "wwwroot\\Posts\\202301030000000_Admin.txt"
+                    });
+            });
+            #endregion
+
             base.OnModelCreating(builder);
         }
 

@@ -2,7 +2,6 @@
 var treeListArea = $("#treeListArea");
 var buttonArea = $("#buttonArea");
 var postArea = $("#postArea");
-var treeListClicked = false;
 
 $(function () {
     // #region jsTree Data Example
@@ -20,109 +19,120 @@ $(function () {
         success: function (response) {
             var postList = $.parseJSON(response);
             var postCollection = [];
-            var rootModel = {
-                "id": `root`,
-                "parent": "#",
-                "text": `Root`,
-                "type": "root"
-            }
-            postCollection.push(rootModel);
 
-            $.each(postList, function (index, value) {
-                var parent = "";
-                var icon = "";
-                if (value.ParentId == 0) {
-                    parent = "root";
-                }
-                else {
-                    parent = `post${value.ParentId}`;
-                }
+            $.each(postList, function (index, post) {
+                switch (post.ParentId) {
+                    case 0:
+                        var postModel = {
+                            "id": `post${post.Id}`,
+                            "parent": "#",
+                            "text": `${post.Header}`
+                        };
+                        break;
 
-                var postModel = {
-                    "id": `post${value.Id}`,
-                    "parent": parent,
-                    "text": `${value.Header}`,
-                    "icon": icon
+                    default:
+                        var postModel = {
+                            "id": `post${post.Id}`,
+                            "parent": `post${post.ParentId}`,
+                            "text": `${post.Header}`
+                        };
                 }
-
                 postCollection.push(postModel);
             });
 
-            $('#treeListArea').jstree({
+            treeListArea.jstree({
                 "core": {
-                    "animation": 200,
                     "check_callback": true,
-                    "themes": { "stripes": true },
                     'data': postCollection
                 },
-                "types": {
-                    "#": {
-                        "max_children": 1,
-                        "max_depth": 4,
-                        "valid_children": ["root"]
-                    },
-                    "root": {
-                        //"icon": "/static/3.3.12/assets/images/tree_icon.png",
-                        "icon": "",
-                        "valid_children": ["default"]
-                    },
-                    "default": {
-                        "valid_children": ["default", "file"]
-                    },
-                    "file": {
-                        "icon": "",
-                        "valid_children": []
-                    }
-                },
                 "plugins": [
-                    "contextmenu",
-                    "dnd",
                     "search",
                     "state",
-                    "types",
-                    "wholerow"
+                    "unique",
+                    "wholerow",
+                    "changed"
                 ]
             });
 
-            $('#treeListArea').on("select_node.jstree", function (e, data) {
-                console.log(e);
-                console.log("-----(select)-----");
-                console.log(data);
+            // #region Search Tree List
+            var to = false;
+            $('#searchTreeList').keyup(function () {
+                if (to) clearTimeout(to);
+                to = setTimeout(function () {
+                    var v = $('#searchTreeList').val();
+                    treeListArea.jstree(true).search(v);
+                }, 250);
+            });
+            // #endregion
 
+            treeListArea.on("select_node.jstree", function (e, data) {
                 var postId = data.node.id.split('post')[1];
+
                 $.ajax({
                     type: "GET",
-                    url: "post/GetPostById",
+                    url: "Post/GetPostById",
                     data: { id: postId },
                     success: function (response) {
                         currentPost = $.parseJSON(response);
 
+                        // Button Area
                         buttonArea.children().remove();
                         var editButton = `<button type="button" onclick="editPost(${currentPost.Id})">Edit</button>`;
                         buttonArea.append(editButton);
 
-                        $("#header").children().remove();
+                        // Post Area
+                        postArea.children().remove();
                         var header = `<h4 id="postHeader">${currentPost.Header}</h4>`;
-                        $("#header").append(header);
-
-                        $("#summernote").children().remove();
-                        $("#summernote").append(currentPost.Context);
+                        var context = `<div id="summernote">${currentPost.Context}</div>`;
+                        postArea.append(header, context);
                     }
                 });
             });
 
-            $('#treeListArea').on("create_node.jstree", function (e, data) {
-                console.log(e);
-                console.log("-----(create)-----");
-                console.log(data);
-
+            treeListArea.on("create_node.jstree", function (e, data) {
                 var parentId = data.node.parent.split('post')[1];
-                console.log(parentId);
                 var header = data.node.text;
-                console.log(header);
+
+                var postModel = {
+                    ParentId: parentId,
+                    CreatedBy: "Görkem", // [Not Completed]
+                    Header: header
+                }
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Post/AddPost",
+                    data: { model: postModel },
+                    success: function (postId) {
+                        treeListArea.jstree('refresh');
+
+                        $.ajax({
+                            type: "GET",
+                            url: "Post/GetPostById",
+                            data: { id: postId },
+                            success: function (response) {
+                                currentPost = $.parseJSON(response);
+
+                                // Button Area
+                                buttonArea.children().remove();
+                                var editButton = `<button type="button" onclick="editPost(${currentPost.Id})">Edit</button>`;
+                                buttonArea.append(editButton);
+
+                                // Post Area
+                                postArea.children().remove();
+                                var header = `<h4 id="postHeader">${currentPost.Header}</h4>`;
+                                var context = `<div id="summernote">${currentPost.Context}</div>`;
+                                postArea.append(header, context);
+                            }
+                        });
+                    }
+                });
             });
 
-            
+            treeListArea.on("changed.jstree", function (e, data) {
+                console.log("-----(change)-----");
+                console.table(data);
+            })
         }
     });
 
@@ -160,29 +170,27 @@ $(function () {
 // #region Functions
 
 function demo_create() {
-    var ref = $('#treeListArea').jstree(true),
+    var ref = treeListArea.jstree(true),
         sel = ref.get_selected();
+    console.log("-----(ref)-----");
+    console.log(ref);
+    console.log("-----(sel)-----");
+    console.log(sel);
     if (!sel.length) { return false; }
     sel = sel[0];
-    sel = ref.create_node(sel, { "type": "file" });
+    sel = ref.create_node(sel);
     if (sel) {
         ref.edit(sel);
     }
 };
 
 function demo_refresh() {
-    $('#treeListArea').jstree('refresh');
+    treeListArea.jstree('refresh');
 }
 
 // #region Refresh Event Listeners
 function refreshEventListener() {
     $(".title").click(function () {
-        if (treeListClicked) {
-            treeListClicked = true;
-        }
-        else {
-            treeListClicked = false;
-        }
         var liId = this.id;
         var postId = liId.split('post')[1];
         $.ajax({
@@ -393,18 +401,6 @@ function savePost(type, parentOrPostId) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 function demo_rename() {
     var ref = $('#jstree_demo').jstree(true),
         sel = ref.get_selected();
@@ -419,3 +415,9 @@ function demo_delete() {
     if (!sel.length) { return false; }
     ref.delete_node(sel);
 };
+
+
+
+
+
+
