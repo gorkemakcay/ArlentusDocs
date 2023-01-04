@@ -29,60 +29,52 @@ html {
 }
 
 body {
-    /*margin-bottom: 60px;*/
 }
 
-
-/* ASIDE AREA */
-ul, #treeList {
-    list-style-type: none;
+#treeListArea {
+    overflow: auto;
 }
-
-li {
-    cursor: pointer;
-}
-
-#treeList {
-    margin: 0;
-    padding: 0;
-    color: white;
-}
-
-/*#treeList > ul {
-    padding-left: 24px;
-}*/
-
-.caret {
-    -webkit-user-select: none; /* Safari 3.1+ */
-    -moz-user-select: none; /* Firefox 2+ */
-    -ms-user-select: none; /* IE 10+ */
-    user-select: none;
-}
-
-    .caret::before {
-        /*content: "\25B6";*/
-        /*content: "\1F5C0";*/
-        content: ">";
-        color: white;
-        display: inline-block;
-        margin-right: 6px;
-    }
-
-.caret-down::before {
-    -ms-transform: rotate(90deg); /* IE 9 */
-    -webkit-transform: rotate(90deg); /* Safari */
-    transform: rotate(90deg);
-}
-
-.nested {
-    display: none;
-}
-
-.active {
-    display: block;
-}
-/* ASIDE AREA */
 
 .jstree {
     color: white;
+}
+
+.jstree-default .jstree-clicked {
+    background: #F47174 !important;
+    font-weight: 500;
+    border-radius: 25px !important;
+    padding-left: 5px;
+    padding-right: 10px;
+}
+
+.jstree-hovered {
+    background-color: #F47174 !important;
+    border-radius: 25px !important;
+}
+
+/*Splitter.js Configurations*/
+.gutter {
+    padding: 0;
+    cursor: col-resize;
+    background-color: #363636 !important;
+    background-repeat: no-repeat !important;
+    background-position: 50% !important;
+}
+
+    .gutter.gutter-horizontal {
+        background-image: url('/vertical_dots.png') !important;
+        background-size: 24px 24px !important;
+    }
+
+#postHeader {
+    color: white;
+}
+
+#editButton, #saveButton {
+    border-radius: 25px;
+    background-color: #F47174;
+    width: 200px;
+    border: none;
+    color: white;
+    font-weight: 500;
 }

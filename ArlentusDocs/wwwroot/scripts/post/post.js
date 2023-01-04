@@ -17,6 +17,8 @@ $(function () {
         type: "GET",
         url: "/Post/GetAllPosts",
         success: function (response) {
+            // #region jsTree
+            // #region Datas from DB
             var postList = $.parseJSON(response);
             var postCollection = [];
 
@@ -39,7 +41,9 @@ $(function () {
                 }
                 postCollection.push(postModel);
             });
+            // #endregion
 
+            // #region Configurations
             treeListArea.jstree({
                 "core": {
                     "check_callback": true,
@@ -49,7 +53,6 @@ $(function () {
                     "search",
                     "state",
                     "unique",
-                    "wholerow",
                     "changed"
                 ]
             });
@@ -64,10 +67,12 @@ $(function () {
                 }, 250);
             });
             // #endregion
+            // #endregion
 
+            // #region Triggers
+            // #region Select
             treeListArea.on("select_node.jstree", function (e, data) {
                 var postId = data.node.id.split('post')[1];
-
                 $.ajax({
                     type: "GET",
                     url: "Post/GetPostById",
@@ -77,7 +82,7 @@ $(function () {
 
                         // Button Area
                         buttonArea.children().remove();
-                        var editButton = `<button type="button" onclick="editPost(${currentPost.Id})">Edit</button>`;
+                        var editButton = `<button id="editButton" type="button" onclick="editPost()">Edit</button>`;
                         buttonArea.append(editButton);
 
                         // Post Area
@@ -88,7 +93,9 @@ $(function () {
                     }
                 });
             });
+            // #endregion
 
+            // #region Create
             treeListArea.on("create_node.jstree", function (e, data) {
                 var parentId = data.node.parent.split('post')[1];
                 var header = data.node.text;
@@ -104,7 +111,11 @@ $(function () {
                     url: "/Post/AddPost",
                     data: { model: postModel },
                     success: function (postId) {
-                        treeListArea.jstree('refresh');
+                        treeListArea.jstree(true).set_id(data.node, `post${postId}`);
+                        treeListArea.jstree(true).deselect_all();
+                        treeListArea.jstree(true).select_node(data.node);
+                        console.log("-----(create)-----");
+                        console.log(data);
 
                         $.ajax({
                             type: "GET",
@@ -115,7 +126,7 @@ $(function () {
 
                                 // Button Area
                                 buttonArea.children().remove();
-                                var editButton = `<button type="button" onclick="editPost(${currentPost.Id})">Edit</button>`;
+                                var editButton = `<button id="editButton" type="button" onclick="editPost()">Edit</button>`;
                                 buttonArea.append(editButton);
 
                                 // Post Area
@@ -128,34 +139,23 @@ $(function () {
                     }
                 });
             });
+            // #endregion
 
+            // #region Change
             treeListArea.on("changed.jstree", function (e, data) {
-                console.log("-----(change)-----");
-                console.table(data);
-            })
+                //console.log("-----(change)-----");
+                //console.log(data);
+            });
+            // #endregion
+
+            treeListArea.on('hover_node.jstree', function (e, data) {
+                //console.log(data);
+            });
+
+            // #endregion
+            // #endregion
         }
     });
-
-
-    //refreshTreeList();
-
-    // #region Default Post Configurations
-    //$.ajax({
-    //    type: "GET",
-    //    url: "/Post/GetPostById",
-    //    data: { id: 18 }, // [Not Completed]
-    //    success: function (response) {
-    //        post = jQuery.parseJSON(response);
-
-    //        var editButton = `<button type="button" onclick="editPost()">Edit</button>`;
-    //        buttonArea.append(editButton);
-
-    //        var header = `<h4 id="postHeader">${post.Header}</h4>`;
-    //        $("#header").append(header);
-    //        $("#summernote").append(post.Context);
-    //    }
-    //});
-    // #endregion
 
     // #region Summernote Configurations
     var styleEle = $("style#fixed");
@@ -165,241 +165,102 @@ $(function () {
     else
         styleEle.remove();
     // #endregion
+
+    // #region Splitter Configuration
+    Split(['.leftSide', '.rightSide'], {
+        gutter: function () {
+            var gutter = document.createElement('div');
+            gutter.className = 'gutter gutter-horizontal';
+            gutter.style.height = 'auto';
+            return gutter
+        },
+        gutterSize: 20,
+        sizes: [20, 80],
+        minSize: [300, 300],
+        snapOffset: 0
+    });
+    // #endregion
 });
 
 // #region Functions
 
-function demo_create() {
-    var ref = treeListArea.jstree(true),
-        sel = ref.get_selected();
-    console.log("-----(ref)-----");
-    console.log(ref);
-    console.log("-----(sel)-----");
-    console.log(sel);
-    if (!sel.length) { return false; }
-    sel = sel[0];
-    sel = ref.create_node(sel);
-    if (sel) {
-        ref.edit(sel);
-    }
-};
-
-function demo_refresh() {
-    treeListArea.jstree('refresh');
-}
-
-// #region Refresh Event Listeners
-function refreshEventListener() {
-    $(".title").click(function () {
-        var liId = this.id;
-        var postId = liId.split('post')[1];
-        $.ajax({
-            type: "GET",
-            url: "/Post/GetAllPostsByParentId",
-            data: { parentId: postId },
-            success: function (response) {
-                var childList = $.parseJSON(response);
-                if (childList != null) {
-                    console.log($(`#${liId}`).html());
-                    $(`#${liId}`).append(`<ul class="nested"></ul>`);
-                    console.log($(`#${liId}`).html());
-
-                    var toggler = $(".caret");
-
-                    for (var i = 0; i < toggler.length; i++) {
-                        toggler[i].addEventListener("click", function () {
-                            this.parentElement.querySelector(".nested").classList.toggle("active");
-                            this.classList.toggle("caret-down");
-                        });
-                    }
-
-                    $.each(childList, function (index, child) {
-                        $.ajax({
-                            async: false,
-                            type: "GET",
-                            url: "/Post/HaveAChild",
-                            data: { postId: post.Id },
-                            success: function (haveAChild) {
-                                if (haveAChild) {
-                                    var title =
-                                        `
-                                            
-                                        `;
-                                }
-                                else {
-
-                                }
-                            }
-                        });
-                    });
-                }
-
-            }
-        });
-    });
-}
-// #endregion
-
-// #region Refresh Tree List
-// [Not Completed -> Fonksiyon haline getirilmesi gerekebilir!]
-function refreshTreeList() {
-    treeListArea.children().remove();
-    $.ajax({
-        type: "GET",
-        url: "/Post/GetAllPostsByParentId",
-        data: { parentId: 0 },
-        success: function (response) {
-            var postList = $.parseJSON(response);
-            treeListArea.append(`<br/><span class="py-1" style="color: white; background-color: green; cursor: pointer; border-radius: 5px; border: 2px solid white;" onclick="newPost(0)">&nbsp; Add New Title (+) &nbsp;</span>`);
-            if (postList != null) {
-                treeListArea.prepend(`<ul id="treeList"></ul>`);
-                $.each(postList, function (index, post) {
-                    $.ajax({
-                        async: false,
-                        type: "GET",
-                        url: "/Post/HaveAChild",
-                        data: { postId: post.Id },
-                        success: function (haveAChild) {
-                            if (haveAChild) {
-                                var title =
-                                    `<li id="post${post.Id}" class="title caret">
-                                        <span>${post.Header}</span>
-                                        <i style="color: white; background-color: green; cursor: pointer; border-radius: 5px;" onclick="newPost (${post.Id})">&nbsp; + &nbsp;</i>
-                                    </li>`;
-                            }
-                            else {
-                                var title =
-                                    `<li id="post${post.Id}" class="title">${post.Header}
-                                        <i style="color: white; background-color: green; cursor: pointer; border-radius: 5px;" onclick="newPost (${post.Id})">&nbsp; + &nbsp;</i>
-                                    </li>`;
-                            }
-                            $("#treeList").append(title);
-                        }
-                    });
-                });
-
-                refreshEventListener();
-            }
-            else {
-
-            }
-        }
-    });
-}
-// #endregion
-
-// #region New Post
-function newPost(parentId) {
-
+// #region HTML Button onClick
+// #region Edit Post Button
+function editPost() {
     // Button Area
     buttonArea.children().remove();
-    var saveButton = `<button type="button" onclick="savePost('add', ${parentId})">Save</button>`;
+    var saveButton = `<button id="saveButton" type="button" onclick="savePost()">Save</button>`;
     buttonArea.append(saveButton);
 
     // Post Area
     postArea.children().remove();
-    var header = `<input id="postHeader" type="text" placeholder="Header" style="width: 100%;" />`;
-    var context = `<div id="summernote"></div>`;
-    postArea.append(header, context);
-    $('#summernote').summernote();
-}
-// #endregion
-
-// #region Edit Post
-function editPost(postId) {
-    // Button Area
-    buttonArea.children().remove();
-    var saveButton = `<button type="button" onclick="savePost('update', ${postId})">Save</button>`;
-    buttonArea.append(saveButton);
-
-    // Post Area
-    postArea.children().remove();
-    var header = `<input id="postHeader" type="text" placeholder="Header" style="width: 100%;" value="${currentPost.Header}" />`;
+    var header = `<input id="postHeaderInput" type="text" placeholder="Header" style="width: 100%;" value="${currentPost.Header}" />`;
     var context = `<div id="summernote">${currentPost.Context}</div>`;
     postArea.append(header, context);
     $('#summernote').summernote();
 }
 // #endregion
 
-// #region Save Post
-function savePost(type, parentOrPostId) {
-    // if type = update -> parentOrPostId = postId
-    // if type = add    -> parentOrPostId = parentId
-    switch (type) {
-        case 'update':
-            currentPost.Header = $("#postHeader").val();
-            currentPost.Context = $('#summernote').summernote('code');
-
-            $.ajax({
-                type: "PUT",
-                url: "/Post/UpdatePost",
-                data: { model: currentPost },
-                success: function (response) {
-                    var updatedPostModel = jQuery.parseJSON(response);
-
-                    // Button Area
-                    buttonArea.children().remove();
-                    var editButton = `<button type="button" onclick="editPost()">Edit</button>`;
-                    buttonArea.append(editButton);
-
-                    // Post Area
-                    postArea.children().remove();
-                    var header = `<h4 id="postHeader">${updatedPostModel.Header}</h4>`;
-                    var context = `<div id="summernote">${updatedPostModel.Context}</div>`;
-                    postArea.append(header, context);
-                },
-                error: function (error) {
-                    alert("Error!");
-                    console.log(error);
-                }
-            });
-            break;
-
-        case 'add':
-            var postModel = {
-                ParentId: parentOrPostId,
-                CreatedBy: "Görkem", // [Not Completed]
-                Header: $("#postHeader").val(),
-                Context: $('#summernote').summernote('code')
-            }
-
-            $.ajax({
-                type: "POST",
-                url: "/Post/AddPost",
-                data: { model: postModel },
-                success: function (postId) {
-                    // Update Tree List
-                    // code snippet...
-
-                    // Button Area
-                    buttonArea.children().remove();
-                    var editButton = `<button type="button" onclick="editPost(${postId})">Edit</button>`;
-                    buttonArea.append(editButton);
-
-                    // Post Area
-                    postArea.children().remove();
-                    var header = `<h4 id="postHeader">${postModel.Header}</h4>`;
-                    var context = `<div id="summernote">${postModel.Context}</div>`;
-                    postArea.append(header, context);
-
-                    refreshTreeList();
-                },
-                error: function (error) {
-                    alert("Error!");
-                    console.log(error);
-                }
-            });
-            break;
-
-        default:
+// #region Save Post Button
+function savePost() {
+    // Rename Selected Node If Header's Value Changed
+    if (currentPost.Header != $("#postHeaderInput").val()) {
+        var obj = treeListArea.jstree(true).get_selected(true)[0];
+        treeListArea.jstree(true).rename_node(obj, $("#postHeaderInput").val());
     }
+
+    // Assign Header & Context To currentPost Model
+    currentPost.Header = $("#postHeaderInput").val();
+    currentPost.Context = $('#summernote').summernote('code');
+
+    $.ajax({
+        type: "PUT",
+        url: "/Post/UpdatePost",
+        data: { model: currentPost },
+        success: function (response) {
+            var updatedPostModel = jQuery.parseJSON(response);
+
+            // Button Area
+            buttonArea.children().remove();
+            var editButton = `<button id="editButton" type="button" onclick="editPost()">Edit</button>`;
+            buttonArea.append(editButton);
+
+            // Post Area
+            postArea.children().remove();
+            var header = `<h4 id="postHeader">${updatedPostModel.Header}</h4>`;
+            var context = `<div id="summernote">${updatedPostModel.Context}</div>`;
+            postArea.append(header, context);
+        },
+        error: function (error) {
+            alert("Error!");
+            console.log(error);
+        }
+    });
 }
 // #endregion
+// #endregion
 
 // #endregion
 
 
+function demo_create() {
+    var ref = treeListArea.jstree(true),
+        sel = ref.get_selected();
+    //console.log("-----(ref)-----");
+    //console.log(ref);
+    //console.log("-----(sel)-----");
+    //console.log(sel);
+    if (!sel.length) { return false; }
+    sel = sel[0];
+    sel = ref.create_node(sel);
+    //if (sel) {
+    //    ref.edit(sel);
+    //}
+};
 
+function demo_refresh() {
+    treeListArea.jstree('refresh');
+}
 
 function demo_rename() {
     var ref = $('#jstree_demo').jstree(true),
@@ -415,9 +276,3 @@ function demo_delete() {
     if (!sel.length) { return false; }
     ref.delete_node(sel);
 };
-
-
-
-
-
-

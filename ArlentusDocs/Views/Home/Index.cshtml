@@ -5,24 +5,77 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/themes/default/style.min.css" />
 @*<link href="~/css/jsTree.css" rel="stylesheet" />*@
 
-<div class="row">
-    <div class="col-2">
+<div class="row content">
+    <div class="cell leftSide p-3" style="background-color: #3D3D3D; border-radius: 50px;">
         <br />
-        <button class="btn btn-success" style="width: 100%; padding: 0px;" onclick="demo_create()">Create</button>
+
+        @*<div class="dropdown">
+                <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" style="width: 100%; padding: 0px; border-radius: 25px; font-weight: 500;">
+                    Create
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li><a class="dropdown-item" href="#">Template 1</a></li>
+                    <li><a class="dropdown-item" href="#">Template 2</a></li>
+                    <li><a class="dropdown-item" href="#">Template 3</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Empty</a></li>
+                </ul>
+            </div>*@
+
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingOne">
+                    <button class="accordion-button py-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                        Create
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                    <div class="accordion-body p-0" style="background-color: #363636 !important;">
+                        <div class="row m-0 text-center">
+                            <div class="col-6 py-1" style="background-color:brown;">
+                                Template 1
+                            </div>
+                            <div class="col-6 py-1" style="background-color: darkorange;">
+                                Template 2
+                            </div>
+                        </div>
+                        <div class="row m-0 text-center">
+                            <div class="col-6 py-1" style="background-color: cadetblue;">
+                                Template 3
+                            </div>
+                            <div class="col-6 py-1" style="background-color: darkblue;">
+                                Template 4
+                            </div>
+                        </div>
+                        <div class="row m-0 text-center" style="border-radius: 100px !important;">
+                            <div class="col-12 py-1" style="background-color: cadetblue;">
+                                Empty
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <br />
-        <button class="btn btn-primary mt-1" style="width: 100%; padding: 0px;" onclick="demo_refresh()">Refresh</button>
+
+        <button class="btn btn-success" style="width: 100%; padding: 0px; border-radius: 25px; font-weight: 500;" onclick="demo_create()">Create</button>
+
         <br />
         <br />
-        <input id="searchTreeList" type="text" placeholder="Search..." class="form-control py-0" />
+
+        <input id="searchTreeList" type="text" placeholder="Search..." class="form-control py-0" style="border-radius: 25px; border: none;" />
+
         <br />
+
         <div id="treeListArea">
 
         </div>
     </div>
 
-    <div class="col-10 mt-5">
-        <div id="buttonArea"></div>
+    <div class="cell rightSide p-3" style="background-color: #3D3D3D; border-radius: 50px;">
         <br />
+        <div id="buttonArea"></div>
         <br />
         <div id="postArea">
             <div id="header"></div>
@@ -32,7 +85,8 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
+    <script src="https://unpkg.com/split.js/dist/split.min.js"></script>
     <script src="~/scripts/sidebar/sidebar.js"></script>
     <script src="~/scripts/post/post.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.2.1/jstree.min.js"></script>
 }
